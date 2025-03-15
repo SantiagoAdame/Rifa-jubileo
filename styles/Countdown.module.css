@@ -1,0 +1,82 @@
+/* styles/Countdown.module.css */
+.countdownContainer {
+    margin: 25px 0;
+    text-align: center;
+    background: linear-gradient(135deg, #f4f1ff 0%, #e8f4ff 100%);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(106, 90, 249, 0.1);
+  }
+  
+  .countdownTitle {
+    font-family: 'Baloo 2', cursive;
+    color: #6a5af9;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .countdownBoxes {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .countdownBox {
+    background-color: white;
+    border-radius: 12px;
+    padding: 15px;
+    min-width: 80px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+  }
+  
+  .countdownBox:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(106, 90, 249, 0.15);
+  }
+  
+  .countdownValue {
+    font-family: 'Nunito', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #6a5af9;
+    margin-bottom: 5px;
+  }
+  
+  .countdownLabel {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+  }
+  
+  /* Estilos responsivos */
+  @media (max-width: 768px) {
+    .countdownBoxes {
+      flex-wrap: wrap;
+    }
+    
+    .countdownBox {
+      min-width: 70px;
+      padding: 10px;
+    }
+    
+    .countdownValue {
+      font-size: 1.7rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .countdownBox {
+      min-width: 60px;
+      padding: 8px;
+    }
+    
+    .countdownValue {
+      font-size: 1.5rem;
+    }
+    
+    .countdownLabel {
+      font-size: 0.8rem;
+    }
+  }
+  

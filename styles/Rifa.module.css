@@ -1,0 +1,396 @@
+/* styles/Rifa.module.css */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Nunito', sans-serif;
+  background-color: #f8faff;
+}
+
+.main {
+  background-color: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+  text-align: center;
+  color: #6a5af9;
+  margin-bottom: 5px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 2.5rem;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 25px;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.premioInfo {
+  background-color: #f4f1ff;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 25px;
+  border-left: 6px solid #6a5af9;
+  box-shadow: 0 4px 12px rgba(106, 90, 249, 0.1);
+}
+
+.premioTitle {
+  font-size: 1.7rem;
+  color: #6a5af9;
+  margin-bottom: 10px;
+  font-family: 'Baloo 2', cursive;
+}
+
+.premioName {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.premioDetalles {
+  font-size: 0.9rem;
+}
+
+.premioDetalles p {
+  margin: 8px 0;
+}
+
+.link {
+  color: #6a5af9;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.numerosContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+  gap: 10px;
+  margin: 25px 0;
+}
+
+.numero {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+}
+
+.disponible {
+  background-color: #f2f5ff;
+  color: #2c3e50;
+}
+
+.disponible:hover {
+  background-color: #e6ebff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.seleccionado {
+  background-color: #6a5af9;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(106, 90, 249, 0.2);
+}
+
+.apartado {
+  background-color: #ff4f81;
+  color: white;
+  cursor: not-allowed;
+}
+
+.leyenda {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.leyendaColor {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+}
+
+.info {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 15px;
+  border-left: 4px solid #6a5af9;
+}
+
+.acciones {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.button {
+  background-color: #00d68f;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 214, 143, 0.2);
+}
+
+.button:hover {
+  background-color: #00bf80;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 214, 143, 0.3);
+}
+
+.button:disabled {
+  background-color: #c5c9d6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cancelButton {
+  background-color: #ff4f81;
+  box-shadow: 0 4px 10px rgba(255, 79, 129, 0.2);
+}
+
+.cancelButton:hover {
+  background-color: #ff3870;
+  box-shadow: 0 6px 15px rgba(255, 79, 129, 0.3);
+}
+
+.confirmarButton {
+  background-color: #00d68f;
+  box-shadow: 0 4px 10px rgba(0, 214, 143, 0.2);
+}
+
+.confirmarButton:hover {
+  background-color: #00bf80;
+  box-shadow: 0 6px 15px rgba(0, 214, 143, 0.3);
+}
+
+.loader {
+  text-align: center;
+  margin: 40px 0;
+  color: #7f8c8d;
+}
+
+.inputGroup {
+  margin-bottom: 15px;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.inputGroup input:focus {
+  border-color: #6a5af9;
+  outline: none;
+  box-shadow: 0 4px 12px rgba(106, 90, 249, 0.1);
+}
+
+.searchContainer {
+  margin-bottom: 25px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 15px;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+  border-color: #6a5af9;
+  outline: none;
+  box-shadow: 0 4px 12px rgba(106, 90, 249, 0.1);
+}
+
+.infoPayment {
+  margin: 25px 0;
+  padding: 20px;
+  background-color: #f4f1ff;
+  border-radius: 15px;
+  border-left: 4px solid #6a5af9;
+}
+
+.infoPayment h3 {
+  margin-top: 0;
+  color: #6a5af9;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.4rem;
+}
+
+.paymentOptions {
+  margin: 15px 0;
+}
+
+.paymentOption {
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.paymentOption:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+.paymentOption p {
+  margin: 5px 0;
+}
+
+.nextSteps {
+  margin-top: 20px;
+}
+
+.nextSteps ol {
+  padding-left: 20px;
+}
+
+.nextSteps li {
+  margin-bottom: 8px;
+}
+
+/* Modal */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: white;
+  padding: 25px;
+  border-radius: 18px;
+  max-width: 520px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.modal h2 {
+  margin-top: 0;
+  color: #6a5af9;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.8rem;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.numerosResumen {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 15px 0;
+}
+
+/* Spinner global */
+.globalLoader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #6a5af9;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .acciones {
+    flex-direction: column;
+  }
+  
+  .button {
+    width: 100%;
+  }
+}
