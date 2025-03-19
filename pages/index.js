@@ -46,30 +46,8 @@ export default function Home() {
       app = initializeApp(firebaseConfig);
       database = getDatabase(app);
       
-      // Cargar datos iniciales
+      // Cargar datos iniciales - usamos el método original para asegurar compatibilidad
       cargarNumerosApartados();
-      
-      // Escuchar cambios en tiempo real
-      const numerosRef = ref(database, 'numerosApartados');
-      const unsubscribe = onValue(numerosRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const allData = snapshot.val();
-          
-          // Filtrar datos para solo incluir estado de apartado
-          // Con compatibilidad para formatos antiguos y nuevos
-          const filteredData = {};
-          Object.keys(allData).forEach(numero => {
-            filteredData[numero] = true; // Simplificado: si existe en la BD, está apartado
-          });
-          
-          setNumerosApartados(filteredData);
-        } else {
-          setNumerosApartados({});
-        }
-      });
-      
-      // Limpiar suscripción al desmontar
-      return () => unsubscribe();
     }
   }, []);
 
@@ -78,32 +56,39 @@ export default function Home() {
       try {
         setIsLoading(true);
         console.log("Intentando obtener datos de Firebase...");
+        
+        // Usamos la referencia original a 'numerosApartados'
         const numerosRef = ref(database, 'numerosApartados');
         console.log("Referencia creada:", numerosRef);
         
-        const snapshot = await get(numerosRef).catch(error => {
-          console.error("Error específico al obtener datos:", error);
-          return { val: () => ({}) };
+        // Configuramos listener para cambios en tiempo real
+        const unsubscribe = onValue(numerosRef, (snapshot) => {
+          try {
+            if (snapshot.exists()) {
+              const data = snapshot.val();
+              console.log("Datos obtenidos:", Object.keys(data).length, "registros");
+              setNumerosApartados(data);
+            } else {
+              console.log("No hay datos en numerosApartados");
+              setNumerosApartados({});
+            }
+            setIsLoading(false);
+          } catch (error) {
+            console.error("Error en listener:", error);
+            setNumerosApartados({});
+            setIsLoading(false);
+          }
+        }, (error) => {
+          console.error("Error en listener setup:", error);
+          setNumerosApartados({});
+          setIsLoading(false);
         });
         
-        if (snapshot.exists()) {
-          const allData = snapshot.val();
-          
-          // Simplificado: si un número existe en la BD, está apartado
-          const filteredData = {};
-          Object.keys(allData).forEach(numero => {
-            filteredData[numero] = true;
-          });
-          
-          console.log("Datos obtenidos:", Object.keys(filteredData).length, "registros");
-          setNumerosApartados(filteredData);
-        } else {
-          setNumerosApartados({});
-        }
+        // Devolvemos la función de limpieza
+        return () => unsubscribe();
       } catch (error) {
         console.error("Error general al cargar datos:", error);
         setNumerosApartados({});
-      } finally {
         setIsLoading(false);
       }
     }
@@ -176,7 +161,6 @@ export default function Home() {
       for (const numero of numerosSeleccionados) {
         const numeroRef = ref(database, `numerosApartados/${numero}`);
         await set(numeroRef, {
-          apartado: true,
           nombre: formData.nombre,
           telefono: formData.telefono,
           email: formData.email,
@@ -220,6 +204,7 @@ export default function Home() {
         let title = '';
         
         // Determinar el estado y apariencia del número
+        // Regresamos a la lógica original - si el número existe en numerosApartados, está apartado
         if (numerosApartados[numero]) {
           className += ` ${styles.apartado}`;
           title = `Apartado`;
