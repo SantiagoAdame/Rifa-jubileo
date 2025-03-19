@@ -55,12 +55,11 @@ export default function Home() {
         if (snapshot.exists()) {
           const allData = snapshot.val();
           
-          // Filtrar datos para solo incluir estado de apartado, no información personal
+          // Filtrar datos para solo incluir estado de apartado
+          // Con compatibilidad para formatos antiguos y nuevos
           const filteredData = {};
           Object.keys(allData).forEach(numero => {
-            filteredData[numero] = {
-              apartado: !!allData[numero] // Convertir a booleano
-            };
+            filteredData[numero] = true; // Simplificado: si existe en la BD, está apartado
           });
           
           setNumerosApartados(filteredData);
@@ -90,12 +89,10 @@ export default function Home() {
         if (snapshot.exists()) {
           const allData = snapshot.val();
           
-          // Filtrar datos para solo incluir estado de apartado, no información personal
+          // Simplificado: si un número existe en la BD, está apartado
           const filteredData = {};
           Object.keys(allData).forEach(numero => {
-            filteredData[numero] = {
-              apartado: true // Si existe en la base de datos, está apartado
-            };
+            filteredData[numero] = true;
           });
           
           console.log("Datos obtenidos:", Object.keys(filteredData).length, "registros");
@@ -115,7 +112,7 @@ export default function Home() {
   // Mantenemos la funcionalidad original de seleccionar/deseleccionar
   const handleNumeroClick = (numero) => {
     // No permitir seleccionar números ya apartados
-    if (numerosApartados[numero] && numerosApartados[numero].apartado) {
+    if (numerosApartados[numero]) {
       return;
     }
     
@@ -164,7 +161,7 @@ export default function Home() {
       for (const numero of numerosSeleccionados) {
         const numeroRef = ref(database, `numerosApartados/${numero}`);
         const snapshot = await get(numeroRef);
-        if (snapshot.exists() && snapshot.val().apartado) {
+        if (snapshot.exists()) {
           numerosNoDisponibles.push(numero);
         }
       }
@@ -223,7 +220,7 @@ export default function Home() {
         let title = '';
         
         // Determinar el estado y apariencia del número
-        if (numerosApartados[numero] && numerosApartados[numero].apartado) {
+        if (numerosApartados[numero]) {
           className += ` ${styles.apartado}`;
           title = `Apartado`;
           // No asignar handler para números apartados
