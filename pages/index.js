@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue, update, get } from 'firebase/database';
+import { getDatabase, ref, onValue, update, get, set } from 'firebase/database';
 import styles from '../styles/Rifa.module.css';
 import CountdownTimer from '../components/CountdownTimer';
 
@@ -52,7 +52,21 @@ export default function Home() {
       // Escuchar cambios en tiempo real
       const numerosRef = ref(database, 'numerosApartados');
       const unsubscribe = onValue(numerosRef, (snapshot) => {
-        setNumerosApartados(snapshot.val() || {});
+        if (snapshot.exists()) {
+          const allData = snapshot.val();
+          
+          // Filtrar datos para solo incluir estado de apartado, no información personal
+          const filteredData = {};
+          Object.keys(allData).forEach(numero => {
+            filteredData[numero] = {
+              apartado: !!allData[numero] // Convertir a booleano
+            };
+          });
+          
+          setNumerosApartados(filteredData);
+        } else {
+          setNumerosApartados({});
+        }
       });
       
       // Limpiar suscripción al desmontar
@@ -64,18 +78,31 @@ export default function Home() {
     if (database) {
       try {
         setIsLoading(true);
-        console.log("Intentando obtener datos de Firebase..."); // Log de depuración
+        console.log("Intentando obtener datos de Firebase...");
         const numerosRef = ref(database, 'numerosApartados');
-        console.log("Referencia creada:", numerosRef); // Log de depuración
+        console.log("Referencia creada:", numerosRef);
         
         const snapshot = await get(numerosRef).catch(error => {
           console.error("Error específico al obtener datos:", error);
-          return { val: () => ({}) }; // Devuelve un objeto con función val que retorna objeto vacío
+          return { val: () => ({}) };
         });
         
-        const datos = snapshot.val() || {};
-        console.log("Datos obtenidos:", Object.keys(datos).length, "registros"); // Log de depuración
-        setNumerosApartados(datos);
+        if (snapshot.exists()) {
+          const allData = snapshot.val();
+          
+          // Filtrar datos para solo incluir estado de apartado, no información personal
+          const filteredData = {};
+          Object.keys(allData).forEach(numero => {
+            filteredData[numero] = {
+              apartado: true // Si existe en la base de datos, está apartado
+            };
+          });
+          
+          console.log("Datos obtenidos:", Object.keys(filteredData).length, "registros");
+          setNumerosApartados(filteredData);
+        } else {
+          setNumerosApartados({});
+        }
       } catch (error) {
         console.error("Error general al cargar datos:", error);
         setNumerosApartados({});
@@ -88,7 +115,7 @@ export default function Home() {
   // Mantenemos la funcionalidad original de seleccionar/deseleccionar
   const handleNumeroClick = (numero) => {
     // No permitir seleccionar números ya apartados
-    if (numerosApartados[numero]) {
+    if (numerosApartados[numero] && numerosApartados[numero].apartado) {
       return;
     }
     
@@ -131,10 +158,16 @@ export default function Home() {
       setShowModal(false);
       
       // Verificar disponibilidad otra vez
-      const numerosRef = ref(database, 'numerosApartados');
-      const snapshot = await get(numerosRef);
-      const numerosActuales = snapshot.val() || {};
-      const numerosNoDisponibles = numerosSeleccionados.filter(num => numerosActuales[num]);
+      const numerosNoDisponibles = [];
+      
+      // Verificar cada número individualmente para evitar problemas de permisos
+      for (const numero of numerosSeleccionados) {
+        const numeroRef = ref(database, `numerosApartados/${numero}`);
+        const snapshot = await get(numeroRef);
+        if (snapshot.exists() && snapshot.val().apartado) {
+          numerosNoDisponibles.push(numero);
+        }
+      }
       
       if (numerosNoDisponibles.length > 0) {
         alert(`Los números ${numerosNoDisponibles.join(', ')} ya han sido apartados. Por favor, elige otros números.`);
@@ -142,20 +175,18 @@ export default function Home() {
         return;
       }
       
-      // Preparar datos a guardar
-      const updates = {};
-      numerosSeleccionados.forEach(numero => {
-        updates[numero] = {
+      // Guardar cada número individualmente con la estructura correcta
+      for (const numero of numerosSeleccionados) {
+        const numeroRef = ref(database, `numerosApartados/${numero}`);
+        await set(numeroRef, {
+          apartado: true,
           nombre: formData.nombre,
           telefono: formData.telefono,
           email: formData.email,
           direccion: formData.direccion || null,
           fecha: new Date().toISOString()
-        };
-      });
-      
-      // Guardar en Firebase
-      await update(numerosRef, updates);
+        });
+      }
       
       alert('¡Números apartados con éxito! Por favor realiza tu pago para confirmar tu participación.');
       setNumerosSeleccionados([]);
@@ -192,9 +223,9 @@ export default function Home() {
         let title = '';
         
         // Determinar el estado y apariencia del número
-        if (numerosApartados[numero]) {
+        if (numerosApartados[numero] && numerosApartados[numero].apartado) {
           className += ` ${styles.apartado}`;
-          title = `Apartado por: ${numerosApartados[numero].nombre}`;
+          title = `Apartado`;
           // No asignar handler para números apartados
         } else if (numerosSeleccionados.includes(numero)) {
           className += ` ${styles.seleccionado}`;
