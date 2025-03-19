@@ -18,9 +18,12 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Configuración de números de la rifa
-const numeroInicial = 6001;
-const totalNumeros = 400; // Total de números disponibles
+// Definición de las series de números disponibles para la rifa
+const seriesNumeros = [
+  { inicio: 3401, fin: 3600 },
+  { inicio: 3801, fin: 4000 },
+  { inicio: 6001, fin: 6400 }
+];
 
 // Fecha del sorteo para el contador regresivo
 const fechaSorteo = "July 13, 2025 13:00:00";
@@ -61,18 +64,34 @@ export default function Home() {
     if (database) {
       try {
         setIsLoading(true);
+        console.log("Intentando obtener datos de Firebase..."); // Log de depuración
         const numerosRef = ref(database, 'numerosApartados');
-        const snapshot = await get(numerosRef);
-        setNumerosApartados(snapshot.val() || {});
+        console.log("Referencia creada:", numerosRef); // Log de depuración
+        
+        const snapshot = await get(numerosRef).catch(error => {
+          console.error("Error específico al obtener datos:", error);
+          return { val: () => ({}) }; // Devuelve un objeto con función val que retorna objeto vacío
+        });
+        
+        const datos = snapshot.val() || {};
+        console.log("Datos obtenidos:", Object.keys(datos).length, "registros"); // Log de depuración
+        setNumerosApartados(datos);
       } catch (error) {
-        console.error("Error al cargar datos:", error);
+        console.error("Error general al cargar datos:", error);
+        setNumerosApartados({});
       } finally {
         setIsLoading(false);
       }
     }
   };
 
+  // Mantenemos la funcionalidad original de seleccionar/deseleccionar
   const handleNumeroClick = (numero) => {
+    // No permitir seleccionar números ya apartados
+    if (numerosApartados[numero]) {
+      return;
+    }
+    
     setNumerosSeleccionados(prev => {
       if (prev.includes(numero)) {
         return prev.filter(num => num !== numero);
@@ -149,44 +168,55 @@ export default function Home() {
     }
   };
 
+  // Función para generar todos los números según las series configuradas
+  const generarTodosLosNumeros = () => {
+    const todosLosNumeros = [];
+    
+    seriesNumeros.forEach(serie => {
+      for (let num = serie.inicio; num <= serie.fin; num++) {
+        todosLosNumeros.push(num);
+      }
+    });
+    
+    return todosLosNumeros;
+  };
+
   // Renderizar números
   const renderNumeros = () => {
-    const numeros = [];
-    for (let i = 0; i < totalNumeros; i++) {
-      const numeroReal = numeroInicial + i;
-      
-      // Si hay búsqueda, filtrar números que no coinciden
-      if (searchNumero && !numeroReal.toString().includes(searchNumero)) {
-        continue;
-      }
-      
-      let className = `${styles.numero}`;
-      let handler = null;
-      let title = '';
-      
-      if (numerosApartados[numeroReal]) {
-        className += ` ${styles.apartado}`;
-        title = `Apartado por: ${numerosApartados[numeroReal].nombre}`;
-      } else if (numerosSeleccionados.includes(numeroReal)) {
-        className += ` ${styles.seleccionado}`;
-        handler = () => handleNumeroClick(numeroReal);
-      } else {
-        className += ` ${styles.disponible}`;
-        handler = () => handleNumeroClick(numeroReal);
-      }
-      
-      numeros.push(
-        <div 
-          key={numeroReal} 
-          className={className}
-          onClick={handler}
-          title={title}
-        >
-          {numeroReal}
-        </div>
-      );
-    }
-    return numeros;
+    const todosLosNumeros = generarTodosLosNumeros();
+    return todosLosNumeros
+      .filter(numero => !searchNumero || numero.toString().includes(searchNumero))
+      .map(numero => {
+        let className = `${styles.numero}`;
+        let handler = null;
+        let title = '';
+        
+        // Determinar el estado y apariencia del número
+        if (numerosApartados[numero]) {
+          className += ` ${styles.apartado}`;
+          title = `Apartado por: ${numerosApartados[numero].nombre}`;
+          // No asignar handler para números apartados
+        } else if (numerosSeleccionados.includes(numero)) {
+          className += ` ${styles.seleccionado}`;
+          handler = () => handleNumeroClick(numero);
+          title = 'Seleccionado - Clic para deseleccionar';
+        } else {
+          className += ` ${styles.disponible}`;
+          handler = () => handleNumeroClick(numero);
+          title = 'Disponible - Clic para seleccionar';
+        }
+        
+        return (
+          <div 
+            key={numero} 
+            className={className}
+            onClick={handler}
+            title={title}
+          >
+            {numero}
+          </div>
+        );
+      });
   };
 
   return (
@@ -237,7 +267,7 @@ export default function Home() {
         <div className={styles.searchContainer}>
           <input 
             type="text" 
-            placeholder="Buscar número... (ej: 6001)" 
+            placeholder="Buscar número específico..." 
             className={styles.searchInput}
             value={searchNumero}
             onChange={handleSearchChange}
@@ -325,23 +355,22 @@ export default function Home() {
               <p>Total a donar: ${numerosSeleccionados.length * 100}.00 MXN</p>
               
               <div className={styles.paymentOptions}>
-  <h4>Opciones de pago:</h4>
-  <div className={styles.paymentOption}>
-    <p><strong>Transferencia bancaria (Banorte)</strong></p>
-    <p>Beneficiario: Santiago Adame Alemán</p>
-    <p>Cuenta: 0014797925</p>
-    <p>CLABE: 072180000147979256</p>
-    <p>Tarjeta: 4189 1430 9218 3857</p>
-  </div>
-  
-  <div className={styles.paymentOption}>
-    <p><strong>Transferencia bancaria (BBVA)</strong></p>
-    <p>Beneficiario: María José Adame Alemán</p>
-    <p>CLABE: 012 540 01533141418 3</p>
-    <p>Tarjeta de débito: 4152 3143 8853 9465</p>
-  </div>
-</div>
-
+                <h4>Opciones de pago:</h4>
+                <div className={styles.paymentOption}>
+                  <p><strong>Transferencia bancaria (Banorte)</strong></p>
+                  <p>Beneficiario: Santiago Adame Alemán</p>
+                  <p>Cuenta: 0014797925</p>
+                  <p>CLABE: 072180000147979256</p>
+                  <p>Tarjeta: 4189 1430 9218 3857</p>
+                </div>
+                
+                <div className={styles.paymentOption}>
+                  <p><strong>Transferencia bancaria (BBVA)</strong></p>
+                  <p>Beneficiario: María José Adame Alemán</p>
+                  <p>CLABE: 012 540 01533141418 3</p>
+                  <p>Tarjeta de débito: 4152 3143 8853 9465</p>
+                </div>
+              </div>
               
               <div className={styles.nextSteps}>
                 <p><strong>Pasos siguientes:</strong></p>
